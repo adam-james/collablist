@@ -17,6 +17,10 @@ defmodule SpotiWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/authorize", AuthorizationController, :authorize
+    get "/callback", AuthenticationController, :authenticate
+    get "/search", SearchController, :index
+    post "/search", SearchController, :search
   end
 
   # Other scopes may use custom stacks.
