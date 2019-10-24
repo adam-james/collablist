@@ -1,10 +1,15 @@
 defmodule SpotiWeb.AuthenticationController do
   use SpotiWeb, :controller
+  alias Spoti.Profiles
   
   def authenticate(conn, params) do
-    case Spotify.Authentication.authenticate(conn, params) do
-      {:ok, conn} -> redirect(conn, to: "/")
-      {:error, _reason, conn} -> redirect(conn, to: "/error")
-    end
+    # TODO handle errors
+    {:ok, conn} = Spotify.Authentication.authenticate(conn, params)
+    {:ok, spotify_profile} = Spotify.Profile.me(conn)
+    {:ok, profile} = Profiles.find_or_create_profile(spotify_profile)
+
+    conn
+      |> put_session(:user_id, profile.id)
+      |> redirect(to: "/dashboard")
   end
 end

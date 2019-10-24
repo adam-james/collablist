@@ -23,8 +23,22 @@ defmodule SpotiWeb.Router do
     post "/search", SearchController, :search
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", SpotiWeb do
-  #   pipe_through :api
-  # end
+  scope "dashboard", SpotiWeb.Dashboard, as: :dashboard do
+    pipe_through [:browser, :authenticate_user]
+
+    get "/", DashboardController, :index
+  end
+
+  defp authenticate_user(conn, _) do
+    case get_session(conn, :user_id) do
+      nil ->
+        conn
+        |> Phoenix.Controller.put_flash(:error, "You must be logged in to view that page.")
+        |> Phoenix.Controller.redirect(to: "/")
+        |> halt()
+      user_id ->
+        # TODO rethink profile/user naming. just have one name
+        assign(conn, :current_user, Spoti.Profiles.get_profile!(user_id))
+    end
+  end
 end
