@@ -3,8 +3,8 @@ defmodule Spoti.Repo.Migrations.CreateProfiles do
 
   def change do
     create table(:profiles) do
-      add :display_name, :string
-      add :spotify_id, :string
+      add :display_name, :string, null: false
+      add :spotify_id, :string, null: false
 
       timestamps()
     end
