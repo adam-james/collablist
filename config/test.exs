@@ -2,8 +2,6 @@ use Mix.Config
 
 # Configure your database
 config :spoti, Spoti.Repo,
-  username: "postgres",
-  password: "postgres",
   database: "spoti_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
