@@ -36,6 +36,7 @@ defmodule SpotiWeb.Router do
         |> Phoenix.Controller.put_flash(:error, "You must be logged in to view that page.")
         |> Phoenix.Controller.redirect(to: "/")
         |> halt()
+
       user_id ->
         # TODO rethink profile/user naming. just have one name
         assign(conn, :current_user, Spoti.Profiles.get_profile!(user_id))

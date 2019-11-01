@@ -7,7 +7,10 @@ defmodule Spoti.ProfilesTest do
     alias Spoti.Profiles.Profile
 
     @valid_attrs %{display_name: "some display_name", spotify_id: "some spotify_id"}
-    @update_attrs %{display_name: "some updated display_name", spotify_id: "some updated spotify_id"}
+    @update_attrs %{
+      display_name: "some updated display_name",
+      spotify_id: "some updated spotify_id"
+    }
     @invalid_attrs %{display_name: nil, spotify_id: nil}
 
     def profile_fixture(attrs \\ %{}) do

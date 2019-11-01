@@ -7,5 +7,5 @@ defmodule SpotiWeb.Dashboard.DashboardController do
     profile = conn.assigns.current_user
     playlists = Playlists.list_profile_playlists(profile)
     render(conn, "index.html", profile: profile, playlists: playlists)
-  end  
+  end
 end

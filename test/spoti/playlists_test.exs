@@ -9,7 +9,7 @@ defmodule Spoti.PlaylistsTest do
     alias Spoti.Playlists.Playlist
 
     def profile_fixture() do
-      Repo.insert!(%Profile{ display_name: "Tester", spotify_id: "123" })      
+      Repo.insert!(%Profile{display_name: "Tester", spotify_id: "123"})
     end
 
     def playlist_fixture(profile) do
@@ -17,7 +17,7 @@ defmodule Spoti.PlaylistsTest do
       {:ok, playlist} = Playlists.create_playlist(attrs)
       playlist
     end
-  
+
     setup do
       profile = profile_fixture()
       playlist = playlist_fixture(profile)
@@ -38,7 +38,10 @@ defmodule Spoti.PlaylistsTest do
       assert {:error, %Ecto.Changeset{}} = Playlists.create_playlist(attrs)
     end
 
-    test "list_profile_playlists/1 returns a profile's playlists", %{profile: profile, playlist: playlist} do
+    test "list_profile_playlists/1 returns a profile's playlists", %{
+      profile: profile,
+      playlist: playlist
+    } do
       assert Playlists.list_profile_playlists(profile) == [playlist]
     end
   end
