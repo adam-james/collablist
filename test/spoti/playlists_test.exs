@@ -8,8 +8,13 @@ defmodule Spoti.PlaylistsTest do
     alias Spoti.Profiles.Profile
     alias Spoti.Playlists.Playlist
 
-    def profile_fixture() do
-      Repo.insert!(%Profile{display_name: "Tester", spotify_id: "123"})
+    def profile_fixture(attrs \\ %{}) do
+      {:ok, profile} =
+        %Profile{display_name: "Tester", spotify_id: "123"}
+        |> Profile.changeset(attrs)
+        |> Repo.insert
+
+      profile
     end
 
     def playlist_fixture(profile) do
@@ -36,6 +41,16 @@ defmodule Spoti.PlaylistsTest do
       attrs = %{name: "Test Playlist"}
 
       assert {:error, %Ecto.Changeset{}} = Playlists.create_playlist(attrs)
+    end
+
+    test "get_profile_playlist!/1 returns playlist if it belongs to profile", %{playlist: playlist, profile: profile} do
+      found = Playlists.get_profile_playlist!(profile, playlist.id)
+      assert found == playlist
+    end
+
+    test "get_profile_playlist!/1 raises no result when playlist doesn't belong to profile", %{playlist: playlist} do
+      other_profile = profile_fixture(%{display_name: "Tester 2", spotify_id: "456"})
+      assert_raise Ecto.NoResultsError, fn -> Playlists.get_profile_playlist!(other_profile, playlist.id) end
     end
 
     test "list_profile_playlists/1 returns a profile's playlists", %{

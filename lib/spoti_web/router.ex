@@ -34,7 +34,7 @@ defmodule SpotiWeb.Router do
     pipe_through [:browser, :authenticate_user, :dashboard]
 
     get "/", DashboardController, :index
-    resources "/playlists", PlaylistController, only: [:index, :new, :create]
+    resources "/playlists", PlaylistController, only: [:index, :new, :create, :show]
   end
 
   defp authenticate_user(conn, _) do

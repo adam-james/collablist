@@ -1,0 +1,3 @@
+<h2><%= @playlist.name %></h2>
+
+<p>TODO: add search here</p>

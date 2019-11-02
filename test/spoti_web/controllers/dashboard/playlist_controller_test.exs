@@ -69,12 +69,15 @@ defmodule SpotiWeb.Dashboard.PlaylistControllerTest do
       {:ok, %{conn: conn, current_user: profile}}
     end
 
-    test "redirects to index when data is valid", %{conn: conn} do
+    test "redirects to show when data is valid", %{conn: conn} do
       attrs = %{name: "Test Playlist"}
       conn = post(conn, Routes.dashboard_playlist_path(conn, :create), playlist: attrs)
 
-      # TODO change this to redirect to show
-      assert redirected_to(conn) == Routes.dashboard_playlist_path(conn, :index)
+      assert %{id: id} = redirected_params(conn)
+      assert redirected_to(conn) == Routes.dashboard_playlist_path(conn, :show, id)
+
+      conn = get(conn, Routes.dashboard_playlist_path(conn, :show, id))
+      assert html_response(conn, 200) =~ "Test Playlist"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
