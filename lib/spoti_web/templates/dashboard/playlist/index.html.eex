@@ -1,5 +1,7 @@
 <h2>Your Playlists</h2>
 
+<a href="<%= Routes.dashboard_playlist_path(@conn, :new) %>">New Playlist</a>
+
 <ul>
 <%= for playlist <- @playlists do %>
   <li><%= playlist.name %></li>

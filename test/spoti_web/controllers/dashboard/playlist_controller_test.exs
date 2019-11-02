@@ -46,4 +46,40 @@ defmodule SpotiWeb.Dashboard.PlaylistControllerTest do
       assert resp =~ playlist2.name
     end
   end
+
+  describe "new playlist" do
+    setup %{conn: conn} do
+      profile = profile_fixture()
+      conn = Plug.Test.init_test_session(conn, user_id: profile.id)
+      {:ok, %{conn: conn, current_user: profile}}
+    end
+
+    test "renders form", %{conn: conn} do
+      conn = get(conn, Routes.dashboard_playlist_path(conn, :new))
+      resp = html_response(conn, 200)
+
+      assert resp =~ "New Playlist"
+    end
+  end
+
+  describe "create playlist" do
+    setup %{conn: conn} do
+      profile = profile_fixture()
+      conn = Plug.Test.init_test_session(conn, user_id: profile.id)
+      {:ok, %{conn: conn, current_user: profile}}
+    end
+
+    test "redirects to index when data is valid", %{conn: conn} do
+      attrs = %{name: "Test Playlist"}
+      conn = post(conn, Routes.dashboard_playlist_path(conn, :create), playlist: attrs)
+
+      # TODO change this to redirect to show
+      assert redirected_to(conn) == Routes.dashboard_playlist_path(conn, :index)
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      conn = post(conn, Routes.dashboard_playlist_path(conn, :create), playlist: %{})
+      assert html_response(conn, 200) =~ "New Playlist"
+    end
+  end
 end

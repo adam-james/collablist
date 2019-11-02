@@ -44,5 +44,9 @@ defmodule Spoti.PlaylistsTest do
     } do
       assert Playlists.list_profile_playlists(profile) == [playlist]
     end
+
+    test "change_playlist/1 returns a playlist changeset" do
+      assert %Ecto.Changeset{} = Playlists.change_playlist(%Playlist{})
+    end
   end
 end
