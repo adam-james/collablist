@@ -1,0 +1,7 @@
+<h2>Your Playlists</h2>
+
+<ul>
+<%= for playlist <- @playlists do %>
+  <li><%= playlist.name %></li>
+<% end %>
+</ul>

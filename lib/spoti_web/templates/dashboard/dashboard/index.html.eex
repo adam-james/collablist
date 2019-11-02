@@ -1,11 +1,1 @@
-<h1>Welcome, <%= @profile.display_name %>!</h1>
-
-<section>
-  <h2>Your Playlists</h2>
-
-  <ul>
-  <%= for playlist <- @playlists do %>
-    <li><%= playlist.name %></li>
-  <% end %>
-  </ul>
-</section>
+<h2>Welcome, <%= @profile.display_name %>!</h2>
