@@ -1,0 +1,26 @@
+<h1> Search </h1>
+
+<%= form_for @conn, Routes.dashboard_playlist_search_path(@conn, :index, @playlist), [method: :get], fn f -> %>
+  <%= text_input f, :q %>
+
+  <div>
+    <%= submit "Search" %>
+  </div>
+<% end %>
+
+<h2>Results</h2>
+
+<%= if Enum.any?(@items) do %>
+  <ul>
+  <%= for item <- @items do %>
+    <li>
+      <%= item.name %>
+      <ul>
+      <%= for artist <- item.artists do %>
+        <li><%= artist["name"] %></li>
+      <% end %>
+      </ul>
+    </li>
+  <% end %>
+  </ul>
+<% end %>

@@ -26,15 +26,15 @@ defmodule SpotiWeb.Router do
     get "/", PageController, :index
     get "/authorize", AuthorizationController, :authorize
     get "/callback", AuthenticationController, :authenticate
-    get "/search", SearchController, :index
-    post "/search", SearchController, :search
   end
 
   scope "/dashboard", SpotiWeb.Dashboard, as: :dashboard do
     pipe_through [:browser, :authenticate_user, :dashboard]
 
     get "/", DashboardController, :index
-    resources "/playlists", PlaylistController, only: [:index, :new, :create, :show]
+    resources "/playlists", PlaylistController, only: [:index, :new, :create, :show] do
+      get "/search", SearchController, :index
+    end
   end
 
   defp authenticate_user(conn, _) do
