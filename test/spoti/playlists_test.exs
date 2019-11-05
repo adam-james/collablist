@@ -7,6 +7,7 @@ defmodule Spoti.PlaylistsTest do
   describe "playlists" do
     alias Spoti.Profiles.Profile
     alias Spoti.Playlists.Playlist
+    alias Spoti.Playlists.Track
 
     def profile_fixture(attrs \\ %{}) do
       {:ok, profile} =
@@ -41,6 +42,21 @@ defmodule Spoti.PlaylistsTest do
       attrs = %{name: "Test Playlist"}
 
       assert {:error, %Ecto.Changeset{}} = Playlists.create_playlist(attrs)
+    end
+
+    test "create_track/1 with valid data returns track", %{profile: profile, playlist: playlist} do
+      attrs = %{spotify_id: "123", added_by_id: profile.id, playlist_id: playlist.id}
+
+      assert {:ok, %Track{} = track} = Playlists.create_track(attrs)
+      assert track.spotify_id == "123"
+      assert track.added_by_id == profile.id
+      assert track.playlist_id == playlist.id
+    end
+
+    test "create_track/1 with invalid data returns error changeset" do
+      attrs = %{spotify_id: "123"}
+
+      assert {:error, %Ecto.Changeset{}} = Playlists.create_track(attrs)
     end
 
     test "get_profile_playlist!/1 returns playlist if it belongs to profile", %{

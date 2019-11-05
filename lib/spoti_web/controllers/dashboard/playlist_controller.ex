@@ -33,6 +33,7 @@ defmodule SpotiWeb.Dashboard.PlaylistController do
   def show(conn, %{"id" => id}) do
     profile = conn.assigns.current_user
     playlist = Playlists.get_profile_playlist!(profile, id)
-    render(conn, "show.html", playlist: playlist)
+    {:ok, tracks} = Playlists.get_spotify_tracks(conn, playlist)
+    render(conn, "show.html", playlist: playlist, tracks: tracks)
   end
 end

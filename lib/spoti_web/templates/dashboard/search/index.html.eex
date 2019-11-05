@@ -20,6 +20,13 @@
         <li><%= artist["name"] %></li>
       <% end %>
       </ul>
+      <%= form_for @conn, Routes.dashboard_playlist_track_path(@conn, :create, @playlist), fn f -> %>
+        <%= hidden_input f, :spotify_id, value: item.id %>
+
+        <div>
+          <%= submit "Add To Playlist" %>
+        </div>
+      <% end %>
     </li>
   <% end %>
   </ul>

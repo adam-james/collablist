@@ -2,9 +2,13 @@ defmodule Spoti.Playlists.Playlist do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Spoti.Playlists.Track
+
   schema "playlists" do
     field :name, :string
     field :profile_id, :id
+
+    has_many :tracks, Track
 
     timestamps()
   end

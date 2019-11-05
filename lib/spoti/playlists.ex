@@ -8,6 +8,7 @@ defmodule Spoti.Playlists do
 
   alias Spoti.Profiles.Profile
   alias Spoti.Playlists.Playlist
+  alias Spoti.Playlists.Track
 
   @doc """
   Returns playlists belonging to a profile.
@@ -27,6 +28,30 @@ defmodule Spoti.Playlists do
 
   def change_playlist(%Playlist{} = playlist) do
     Playlist.changeset(playlist, %{})
+  end
+
+  def create_track(attrs \\ %{}) do
+    %Track{}
+    |> Track.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def get_spotify_tracks(conn, playlist) do
+    ids =
+      Repo.all(
+        from t in Track,
+          where: t.playlist_id == ^playlist.id,
+          select: t.spotify_id,
+          order_by: t.inserted_at
+      )
+      |> Enum.join(",")
+
+    if String.length(ids) > 0 do
+      # TODO this has a limit of 50 ids
+      Spotify.Track.get_tracks(conn, ids: ids)
+    else
+      {:ok, []}
+    end
   end
 
   @doc """
