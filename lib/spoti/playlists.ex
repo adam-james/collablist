@@ -22,9 +22,7 @@ defmodule Spoti.Playlists do
     Repo.all(from p in Playlist, where: p.profile_id == ^profile.id)
   end
 
-  def get_profile_playlist!(%Profile{} = profile, id) do
-    Repo.one!(from p in Playlist, where: p.profile_id == ^profile.id and p.id == ^id)
-  end
+  def get_playlist!(id), do: Repo.get!(Playlist, id)
 
   def change_playlist(%Playlist{} = playlist) do
     Playlist.changeset(playlist, %{})

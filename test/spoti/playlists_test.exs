@@ -59,22 +59,9 @@ defmodule Spoti.PlaylistsTest do
       assert {:error, %Ecto.Changeset{}} = Playlists.create_track(attrs)
     end
 
-    test "get_profile_playlist!/1 returns playlist if it belongs to profile", %{
-      playlist: playlist,
-      profile: profile
-    } do
-      found = Playlists.get_profile_playlist!(profile, playlist.id)
+    test "get_playlist!/1 returns playlist with given id", %{playlist: playlist} do
+      found = Playlists.get_playlist!(playlist.id)
       assert found == playlist
-    end
-
-    test "get_profile_playlist!/1 raises no result when playlist doesn't belong to profile", %{
-      playlist: playlist
-    } do
-      other_profile = profile_fixture(%{display_name: "Tester 2", spotify_id: "456"})
-
-      assert_raise Ecto.NoResultsError, fn ->
-        Playlists.get_profile_playlist!(other_profile, playlist.id)
-      end
     end
 
     test "list_profile_playlists/1 returns a profile's playlists", %{
