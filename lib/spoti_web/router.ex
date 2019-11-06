@@ -1,10 +1,12 @@
 defmodule SpotiWeb.Router do
   use SpotiWeb, :router
+  import Phoenix.LiveView.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
+    plug Phoenix.LiveView.Flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -22,6 +24,9 @@ defmodule SpotiWeb.Router do
 
     # TODO remove later
     resources "/todos", TodoController
+
+    # TODO remove later
+    live "/counter", CounterLive, session: [:count]
 
     get "/", PageController, :index
     get "/authorize", AuthorizationController, :authorize
