@@ -15,17 +15,17 @@ defmodule SpotiWeb.Dashboard.SearchLive do
   end
 
   def handle_event("search", %{"value" => value}, socket) do
-    # TODO clean this up.
-    # Can you keep this elsewhere? Not query every time?
     if String.length(value) < 1 do
       {:noreply, update(socket, :items, fn _ -> [] end)}
     else
+      # TODO clean this up.
+      # Can you keep this elsewhere? Not query every time?
       {:ok, %{items: items}} =
-      Spotify.Search.query(
-        Spoti.Auth.get_credentials!(socket.assigns.profile),
-        q: value,
-        type: "track"
-      )
+        Spotify.Search.query(
+          Spoti.Auth.get_credentials!(socket.assigns.profile),
+          q: value,
+          type: "track"
+        )
 
       {:noreply, update(socket, :items, fn _ -> items end)}
     end

@@ -10,7 +10,7 @@ defmodule Spoti.Auth do
   alias Spoti.Profiles.Profile
 
   def get_credentials!(%Profile{id: id} = profile) do
-    creds = Repo.one!(from c in Credential, where: c.id == ^id)
+    creds = Repo.one!(from c in Credential, where: c.profile_id == ^id)
     %Spotify.Credentials{access_token: creds.access_token, refresh_token: creds.refresh_token}
   end
 
@@ -48,5 +48,12 @@ defmodule Spoti.Auth do
     credential
     |> Credential.changeset(attrs)
     |> Repo.update()
+  end
+
+  def upsert_credential(attrs \\ %{}) do
+    case Repo.one(from c in Credential, where: c.profile_id == ^attrs.profile_id) do
+      nil -> create_credential(attrs)
+      creds -> update_credential(creds, attrs)
+    end
   end
 end
