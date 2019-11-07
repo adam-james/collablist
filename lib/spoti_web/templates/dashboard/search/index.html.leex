@@ -1,0 +1,20 @@
+<h1> Search </h1>
+
+<input type="text" phx-keyup="search" phx-debounce="1000" />
+
+<h2>Results</h2>
+
+<%= if Enum.any?(@items) do %>
+  <ul>
+  <%= for item <- @items do %>
+    <li>
+      <%= item.name %>
+      <ul>
+      <%= for artist <- item.artists do %>
+        <li><%= artist["name"] %></li>
+      <% end %>
+      </ul>
+    </li>
+  <% end %>
+  </ul>
+<% end %>

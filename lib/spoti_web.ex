@@ -48,7 +48,7 @@ defmodule SpotiWeb do
           live_render: 2,
           live_render: 3,
           live_link: 1,
-          live_link: 2,
+          live_link: 2
           # TODO why are these private? The instructions say to import.
           # live_component: 2,
           # live_component: 3,
