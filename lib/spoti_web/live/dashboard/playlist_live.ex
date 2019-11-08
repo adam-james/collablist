@@ -1,20 +1,37 @@
 defmodule SpotiWeb.Dashboard.PlaylistLive do
   use Phoenix.LiveView
 
+  alias SpotiWeb.Presence
   alias Spoti.Playlists
 
   def render(assigns) do
     Phoenix.View.render(SpotiWeb.Dashboard.PlaylistView, "show.html", assigns)
   end
 
-  def mount(session, socket) do
-    SpotiWeb.Endpoint.subscribe(topic(session[:playlist]))
+  def mount(%{profile: profile, playlist: playlist, tracks: tracks}, socket) do
+    # Track user presence.
+    Presence.track(
+      self(),
+      topic(playlist),
+      profile.id,
+      %{
+        display_name: profile.display_name,
+        id: profile.id
+      }
+    )
+
+    # Subscribe to topic for updates from other live views.
+    SpotiWeb.Endpoint.subscribe(topic(playlist))
+
+    users = get_present_users(playlist)
+
     socket =
       socket
       |> assign(:search_results, [])
-      |> assign(:profile, session[:profile])
-      |> assign(:playlist, session[:playlist])
-      |> assign(:tracks, session[:tracks])
+      |> assign(:profile, profile)
+      |> assign(:playlist, playlist)
+      |> assign(:tracks, tracks)
+      |> assign(:users, users)
 
     {:ok, socket}
   end
@@ -38,6 +55,7 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
 
   def handle_event("add_track", %{"spotify_id" => spotify_id}, socket) do
     playlist = socket.assigns.playlist
+
     {:ok, track} =
       Playlists.create_track(%{
         spotify_id: spotify_id,
@@ -60,8 +78,23 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
     {:noreply, socket}
   end
 
+  # Handle messages from other live views.
   def handle_info(%{event: "new_track", payload: %{tracks: tracks}}, socket) do
     {:noreply, update(socket, :tracks, fn _ -> tracks end)}
+  end
+
+  # Handle presence diffs.
+  def handle_info(%{event: "presence_diff"}, socket = %{assigns: %{playlist: playlist}}) do
+    users = get_present_users(playlist)
+    {:noreply, assign(socket, users: users)}
+  end
+
+  defp get_present_users(playlist) do
+    Presence.list(topic(playlist))
+    |> Enum.map(fn {_user_id, data} ->
+      data[:metas]
+      |> List.first()
+    end)
   end
 
   defp topic(playlist) do

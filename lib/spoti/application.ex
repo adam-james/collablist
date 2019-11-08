@@ -11,9 +11,10 @@ defmodule Spoti.Application do
       # Start the Ecto repository
       Spoti.Repo,
       # Start the endpoint when the application starts
-      SpotiWeb.Endpoint
+      SpotiWeb.Endpoint,
       # Starts a worker by calling: Spoti.Worker.start_link(arg)
       # {Spoti.Worker, arg},
+      SpotiWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

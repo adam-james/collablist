@@ -1,5 +1,14 @@
 <h2><%= @playlist.name %></h2>
 
+<section>
+  <h3>Presence</h3>
+  <ul>
+  <%= for user <- @users do %>
+    <li><%= user.display_name %></li>
+  <% end %>
+  </ul>
+</section>
+
 <label>
   Add Track
   <input type="text" phx-keyup="search" phx-debounce="1000" />
