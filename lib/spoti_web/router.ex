@@ -39,7 +39,6 @@ defmodule SpotiWeb.Router do
     get "/", DashboardController, :index
 
     resources "/playlists", PlaylistController, only: [:index, :new, :create, :show] do
-      get "/search", SearchController, :index
       resources "/tracks", TrackController, only: [:create]
     end
   end

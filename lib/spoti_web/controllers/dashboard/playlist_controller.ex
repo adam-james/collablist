@@ -1,5 +1,6 @@
 defmodule SpotiWeb.Dashboard.PlaylistController do
   use SpotiWeb, :controller
+  import Phoenix.LiveView.Controller
 
   alias Spoti.Playlists
   alias Spoti.Playlists.Playlist
@@ -31,9 +32,12 @@ defmodule SpotiWeb.Dashboard.PlaylistController do
   end
 
   def show(conn, %{"id" => id}) do
+    profile = conn.assigns.current_user
     playlist = Playlists.get_playlist!(id)
-    # TODO handle error
-    {:ok, tracks} = Playlists.get_spotify_tracks(conn, playlist)
-    render(conn, "show.html", playlist: playlist, tracks: tracks)
+    {:ok, tracks} = Playlists.get_spotify_tracks(Spoti.Auth.get_credentials!(profile), playlist)
+
+    live_render(conn, SpotiWeb.Dashboard.PlaylistLive,
+      session: %{profile: profile, playlist: playlist, tracks: tracks}
+    )
   end
 end

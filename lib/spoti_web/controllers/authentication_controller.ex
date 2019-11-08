@@ -4,7 +4,9 @@ defmodule SpotiWeb.AuthenticationController do
   alias Spoti.Auth
 
   def authenticate(conn, params) do
-    profile =
+    # This is happy path. Given the left-right in the pipeline we need to assume
+    # left-right uncertainty coming out.
+    {:ok, profile} =
       params
       |> get_creds()
       |> find_or_create_profile()
@@ -41,6 +43,6 @@ defmodule SpotiWeb.AuthenticationController do
         profile_id: profile.id
       })
 
-    profile
+    {:ok, profile}
   end
 end

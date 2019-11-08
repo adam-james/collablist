@@ -1,0 +1,37 @@
+<h2><%= @playlist.name %></h2>
+
+<label>
+  Add Track
+  <input type="text" phx-keyup="search" phx-debounce="1000" />
+</label>
+
+<%= if Enum.any?(@search_results) do %>
+  <ul>
+  <%= for result <- @search_results do %>
+    <li>
+      <%= result.name %>
+      <button phx-click="add_track" phx-value-spotify_id="<%= result.id %>">
+        Add To Playlist
+      </button>
+      <ul>
+      <%= for artist <- result.artists do %>
+        <li><%= artist["name"] %></li>
+      <% end %>
+      </ul>
+    </li>
+  <% end %>
+  </ul>
+<% end %>
+
+<h3>Tracks</h3>
+
+<ul>
+<%= for track <- @tracks do %>
+  <li><%= track.name %></li>
+  <ul>
+  <%= for artist <- track.artists do %>
+    <li><%= artist["name"] %></li>
+  <% end %>
+  </ul>
+<% end %>
+</ul>
