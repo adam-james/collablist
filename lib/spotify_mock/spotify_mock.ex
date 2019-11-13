@@ -1,0 +1,2 @@
+defmodule SpotifyMock do
+end

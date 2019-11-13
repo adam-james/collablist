@@ -34,7 +34,7 @@ defmodule Spoti.Playlists do
     |> Repo.insert()
   end
 
-  def get_spotify_tracks(conn, playlist) do
+  def get_spotify_tracks(creds, playlist) do
     ids =
       Repo.all(
         from t in Track,
@@ -46,7 +46,7 @@ defmodule Spoti.Playlists do
 
     if String.length(ids) > 0 do
       # TODO this has a limit of 50 ids
-      Spotify.Track.get_tracks(conn, ids: ids)
+      SpotifyMock.Track.get_tracks(creds, ids: ids)
     else
       {:ok, []}
     end
