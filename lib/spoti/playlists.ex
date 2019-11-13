@@ -46,7 +46,7 @@ defmodule Spoti.Playlists do
 
     if String.length(ids) > 0 do
       # TODO this has a limit of 50 ids
-      SpotifyMock.Track.get_tracks(creds, ids: ids)
+      Spotify.Track.get_tracks(creds, ids: ids)
     else
       {:ok, []}
     end
