@@ -34,10 +34,9 @@ defmodule SpotiWeb.Dashboard.PlaylistController do
   def show(conn, %{"id" => id}) do
     profile = conn.assigns.current_user
     playlist = Playlists.get_playlist!(id)
-    {:ok, tracks} = Playlists.get_spotify_tracks(Spoti.Auth.get_credentials!(profile), playlist)
 
     live_render(conn, SpotiWeb.Dashboard.PlaylistLive,
-      session: %{profile: profile, playlist: playlist, tracks: tracks}
+      session: %{profile: profile, playlist: playlist}
     )
   end
 end

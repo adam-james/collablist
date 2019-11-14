@@ -8,7 +8,7 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
     Phoenix.View.render(SpotiWeb.Dashboard.PlaylistView, "show.html", assigns)
   end
 
-  def mount(%{profile: profile, playlist: playlist, tracks: tracks}, socket) do
+  def mount(%{profile: profile, playlist: playlist}, socket) do
     # Track user presence.
     Presence.track(
       self(),
@@ -24,6 +24,7 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
     SpotiWeb.Endpoint.subscribe(topic(playlist))
 
     users = get_present_users(playlist)
+    {:ok, tracks} = get_tracks(profile, playlist)
 
     socket =
       socket
@@ -55,8 +56,9 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
 
   def handle_event("add_track", %{"spotify_id" => spotify_id}, socket) do
     playlist = socket.assigns.playlist
+    profile = socket.assigns.profile
 
-    {:ok, track} =
+    {:ok, _track} =
       Playlists.create_track(%{
         spotify_id: spotify_id,
         playlist_id: playlist.id,
@@ -64,8 +66,7 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
       })
 
     # TODO just load the last track
-    {:ok, tracks} =
-      Playlists.get_spotify_tracks(Spoti.Auth.get_credentials!(socket.assigns.profile), playlist)
+    {:ok, tracks} = get_tracks(profile, playlist)
 
     # TODO just send the new track
     SpotiWeb.Endpoint.broadcast_from(self(), topic(playlist), "new_track", %{tracks: tracks})
@@ -99,5 +100,12 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
 
   defp topic(playlist) do
     "playlist:#{playlist.id}"
+  end
+
+  defp get_tracks(profile, playlist) do
+    Playlists.get_spotify_tracks(
+      Spoti.Auth.get_credentials!(profile), 
+      playlist
+    )
   end
 end
