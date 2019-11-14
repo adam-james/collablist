@@ -13,39 +13,39 @@ defmodule SpotifyMock.SearchTest do
         )
 
       assert items == [
-        %Spotify.Track{
-          album: %Spotify.Album{},
-          artists: [%{"name" => "Artist One"}],
-          id: "123",
-          name: "Track One"
-          # Additional fields
-          # available_markets
-          # disc_number
-          # duration_ms
-          # explicit
-          # external_ids
-          # href
-          # is_playable
-          # linked_from
-          # popularity
-          # preview_url
-          # track_number
-          # type
-          # uri
-        },
-        %Spotify.Track{
-          album: %Spotify.Album{},
-          artists: [%{"name" => "Artist One"}],
-          id: "456",
-          name: "Track Two"
-        },
-        %Spotify.Track{
-          album: %Spotify.Album{},
-          artists: [%{"name" => "Artist One"}],
-          id: "789",
-          name: "Track Three"
-        }
-      ]
+               %Spotify.Track{
+                 album: %Spotify.Album{},
+                 artists: [%{"name" => "Artist One"}],
+                 id: "123",
+                 name: "Track One"
+                 # Additional fields
+                 # available_markets
+                 # disc_number
+                 # duration_ms
+                 # explicit
+                 # external_ids
+                 # href
+                 # is_playable
+                 # linked_from
+                 # popularity
+                 # preview_url
+                 # track_number
+                 # type
+                 # uri
+               },
+               %Spotify.Track{
+                 album: %Spotify.Album{},
+                 artists: [%{"name" => "Artist One"}],
+                 id: "456",
+                 name: "Track Two"
+               },
+               %Spotify.Track{
+                 album: %Spotify.Album{},
+                 artists: [%{"name" => "Artist One"}],
+                 id: "789",
+                 name: "Track Three"
+               }
+             ]
     end
   end
 end

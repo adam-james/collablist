@@ -75,4 +75,22 @@ defmodule Spoti.PlaylistsTest do
       assert %Ecto.Changeset{} = Playlists.change_playlist(%Playlist{})
     end
   end
+
+  describe "list_recent_playlists/0" do
+    setup do
+      profile = profile_fixture()
+
+      playlists =
+        Enum.map(1..11, fn _ ->
+          playlist_fixture(profile)
+        end)
+
+      {:ok, profile: profile, playlists: playlists}
+    end
+
+    test "returns ten most recent playlists", %{playlists: playlists} do
+      result = Playlists.list_recent_playlists()
+      assert result == Enum.take(playlists, 10)
+    end
+  end
 end

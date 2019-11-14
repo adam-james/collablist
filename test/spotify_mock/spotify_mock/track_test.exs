@@ -7,25 +7,25 @@ defmodule SpotifyMock.TrackTest do
       {:ok, tracks} = SpotifyMock.Track.get_tracks(creds, [])
 
       assert tracks == [
-        %Spotify.Track{
-          album: %Spotify.Album{},
-          artists: [%{"name" => "Artist Two"}],
-          id: "321",
-          name: "Track Four"
-        },
-        %Spotify.Track{
-          album: %Spotify.Album{},
-          artists: [%{"name" => "Artist Two"}],
-          id: "654",
-          name: "Track Five"
-        },
-        %Spotify.Track{
-          album: %Spotify.Album{},
-          artists: [%{"name" => "Artist Two"}],
-          id: "987",
-          name: "Track Six"
-        }
-      ]
+               %Spotify.Track{
+                 album: %Spotify.Album{},
+                 artists: [%{"name" => "Artist Two"}],
+                 id: "321",
+                 name: "Track Four"
+               },
+               %Spotify.Track{
+                 album: %Spotify.Album{},
+                 artists: [%{"name" => "Artist Two"}],
+                 id: "654",
+                 name: "Track Five"
+               },
+               %Spotify.Track{
+                 album: %Spotify.Album{},
+                 artists: [%{"name" => "Artist Two"}],
+                 id: "987",
+                 name: "Track Six"
+               }
+             ]
     end
   end
 end

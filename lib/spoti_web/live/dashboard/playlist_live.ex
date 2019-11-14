@@ -104,7 +104,7 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
 
   defp get_tracks(profile, playlist) do
     Playlists.get_spotify_tracks(
-      Spoti.Auth.get_credentials!(profile), 
+      Spoti.Auth.get_credentials!(profile),
       playlist
     )
   end

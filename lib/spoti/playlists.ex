@@ -22,6 +22,10 @@ defmodule Spoti.Playlists do
     Repo.all(from p in Playlist, where: p.profile_id == ^profile.id)
   end
 
+  def list_recent_playlists do
+    Repo.all(from p in Playlist, order_by: [desc: p.inserted_at], limit: 10)
+  end
+
   def get_playlist!(id), do: Repo.get!(Playlist, id)
 
   def change_playlist(%Playlist{} = playlist) do
