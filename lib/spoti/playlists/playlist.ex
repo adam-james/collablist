@@ -7,6 +7,7 @@ defmodule Spoti.Playlists.Playlist do
   schema "playlists" do
     field :name, :string
     field :profile_id, :id
+    field :spotify_device_id, :string
 
     has_many :tracks, Track
 
@@ -16,7 +17,7 @@ defmodule Spoti.Playlists.Playlist do
   @doc false
   def changeset(playlist, attrs) do
     playlist
-    |> cast(attrs, [:name, :profile_id])
+    |> cast(attrs, [:name, :profile_id, :spotify_device_id])
     |> validate_required([:name, :profile_id])
     |> foreign_key_constraint(:profile_id)
   end

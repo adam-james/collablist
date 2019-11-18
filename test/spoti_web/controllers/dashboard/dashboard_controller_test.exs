@@ -39,6 +39,7 @@ defmodule SpotiWeb.Dashboard.DashboardControllerTest do
       conn = get(conn, Routes.dashboard_dashboard_path(conn, :index))
       resp = html_response(conn, 200)
 
+      # TODO test the order by inserted at
       playlists
       |> Enum.take(10)
       |> Enum.each(fn playlist ->

@@ -4,6 +4,7 @@ defmodule SpotiWeb.Dashboard.PlaylistController do
 
   alias Spoti.Playlists
   alias Spoti.Playlists.Playlist
+  alias Spoti.Auth
 
   def index(conn, _params) do
     profile = conn.assigns.current_user
@@ -13,7 +14,11 @@ defmodule SpotiWeb.Dashboard.PlaylistController do
 
   def new(conn, _params) do
     changeset = Playlists.change_playlist(%Playlist{})
-    render(conn, "new.html", changeset: changeset)
+
+    {:ok, devices} =
+      Spotify.Player.Device.list_devices(Auth.get_credentials!(conn.assigns.current_user))
+
+    render(conn, "new.html", changeset: changeset, devices: devices)
   end
 
   def create(conn, %{"playlist" => playlist_params}) do

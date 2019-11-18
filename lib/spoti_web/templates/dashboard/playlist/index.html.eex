@@ -6,7 +6,9 @@
 <%= for playlist <- @playlists do %>
   <li>
     <%= playlist.name %>
-    <a href="<%= Routes.dashboard_playlist_path(@conn, :show, playlist) %>">View</a>
+    <a href="<%= Routes.dashboard_playlist_path(@conn, :show, playlist) %>">
+      View
+    </a>
   </li>
 <% end %>
 </ul>

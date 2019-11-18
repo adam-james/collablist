@@ -9,6 +9,16 @@
   <%= text_input f, :name %>
   <%= error_tag f, :name %>
 
+  <%= label f, :spotify_device_id %>
+  <%= select(
+        f,
+        :spotify_device_id,
+        Enum.map(@devices, fn device ->
+          [key: device.name, value: device.id]
+        end),
+        prompt: "Select a device") %>
+  <%= error_tag f, :spotify_device_id %>
+
   <div>
     <%= submit "Save" %>
   </div>
