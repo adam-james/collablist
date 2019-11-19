@@ -37,6 +37,28 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
     {:ok, socket}
   end
 
+  def handle_event("play", _params, socket) do
+    body =
+      %{"uris" => Enum.map(socket.assigns.tracks, &Map.get(&1, :uri))}
+      |> Jason.encode!()
+
+    # TODO handle error message if this doesn't match :ok
+    :ok =
+      get_creds!(socket.assigns.profile)
+      |> Spotify.Player.play(body)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("pause", _params, socket) do
+    # TODO handle error message if this doesn't match :ok
+    :ok =
+      get_creds!(socket.assigns.profile)
+      |> Spotify.Player.pause()
+
+    {:noreply, socket}
+  end
+
   def handle_event("search", %{"value" => value}, socket) do
     if String.length(value) < 1 do
       {:noreply, update(socket, :search_results, fn _ -> [] end)}
@@ -107,5 +129,9 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
       Spoti.Auth.get_credentials!(profile),
       playlist
     )
+  end
+
+  defp get_creds!(profile) do
+    Spoti.Auth.get_credentials!(profile)
   end
 end

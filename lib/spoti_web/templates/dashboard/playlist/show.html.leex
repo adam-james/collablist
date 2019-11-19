@@ -1,6 +1,13 @@
 <h2><%= @playlist.name %></h2>
 
 <section>
+  <h3>Playback</h3>
+  <p>TODO only show to owner</p>
+  <button phx-click="play">Play</button>
+  <button phx-click="pause">Pause</button>
+</section>
+
+<section>
   <h3>Presence</h3>
   <ul>
   <%= for user <- @users do %>
