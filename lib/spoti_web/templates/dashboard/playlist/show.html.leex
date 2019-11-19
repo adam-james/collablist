@@ -2,9 +2,12 @@
 
 <section>
   <h3>Playback</h3>
-  <p>TODO only show to owner</p>
-  <button phx-click="play">Play</button>
-  <button phx-click="pause">Pause</button>
+  <p>TODO ADD PLAYBACK STATE HERE</p>
+
+  <%= if @playlist.profile_id == @profile.id do %>
+    <button phx-click="play">Play</button>
+    <button phx-click="pause">Pause</button>
+  <% end %>
 </section>
 
 <section>
