@@ -2,9 +2,10 @@
 
 <section>
   <h3>Playback</h3>
-  <p>TODO ADD PLAYBACK STATE HERE</p>
 
   <%= if @playlist.profile_id == @profile.id do %>
+    <p>TODO ADD PLAYBACK STATE HERE. You are going to have to build your own.</p>
+
     <button phx-click="play">Play</button>
     <button phx-click="pause">Pause</button>
   <% end %>
