@@ -28,14 +28,12 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
     SpotiWeb.Endpoint.subscribe(topic(playlist))
 
     users = get_present_users(playlist)
-    {:ok, tracks} = get_tracks(profile, playlist)
 
     socket =
       socket
       |> assign(:search_results, [])
       |> assign(:profile, profile)
       |> assign(:playlist, playlist)
-      |> assign(:tracks, tracks)
       |> assign(:users, users)
       |> assign(:playback, playback)
 
@@ -45,17 +43,6 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
   def handle_event("play", _params, socket) do
     pid = get_playback_pid(socket.assigns.playlist)
     playback = PlaybackServer.play(pid)
-
-    uri = Enum.map(socket.assigns.tracks, &Map.get(&1, :uri)) |> List.first()
-    body =
-      %{"uris" => [uri], "position_ms" => playback.progress_ms}
-      |> Jason.encode!()
-
-    # TODO handle error message if this doesn't match :ok
-    :ok =
-      get_creds!(socket.assigns.profile)
-      |> Spotify.Player.play(body)
-
     {:noreply, socket}
   end
 
@@ -100,15 +87,14 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
       })
 
     # TODO just load the last track
-    {:ok, tracks} = get_tracks(profile, playlist)
+    # TODO add track to gen server
 
     # TODO just send the new track
-    SpotiWeb.Endpoint.broadcast_from(self(), topic(playlist), "new_track", %{tracks: tracks})
+    # SpotiWeb.Endpoint.broadcast_from(self(), topic(playlist), "new_track", %{tracks: tracks})
 
     socket =
       socket
       |> update(:search_results, fn _ -> [] end)
-      |> update(:tracks, fn _ -> tracks end)
 
     {:noreply, socket}
   end
@@ -141,17 +127,11 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
     "playlist:#{playlist.id}"
   end
 
-  defp get_tracks(profile, playlist) do
-    Playlists.get_spotify_tracks(
-      Spoti.Auth.get_credentials!(profile),
-      playlist
-    )
-  end
-
   defp get_creds!(profile) do
     Spoti.Auth.get_credentials!(profile)
   end
 
+  # TODO this stuff should go through the registry
   defp get_playback(playlist) do
     get_playback_pid(playlist) |> PlaybackServer.get_state()
   end
@@ -161,7 +141,9 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
       nil ->
         {:ok, pid} = PlaybackRegistry.start_playback(playlist.id)
         pid
-      pid -> pid
+
+      pid ->
+        pid
     end
   end
 end

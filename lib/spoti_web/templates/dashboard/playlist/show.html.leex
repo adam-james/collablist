@@ -1,14 +1,26 @@
 <h2><%= @playlist.name %></h2>
 
 <section>
-  <h3>Playback</h3>
+  <h3>Current Track</h3>
 
-  <p>Progress: <%= millis_to_minutes(@playback.progress_ms) %></p>
+  <%= if @playback.current_track != nil do %>
+    <p><%= @playback.current_track.name %></p>
+    <ul>
+    <%= for artist <- @playback.current_track.artists do %>
+      <li><%= artist["name"] %></li>
+    <% end %>
+    </ul>
 
-  <%= if @playlist.profile_id == @profile.id do %>
-    <button phx-click="play">Play</button>
-    <button phx-click="pause">Pause</button>
+    <p>Progress: <%= millis_to_minutes(@playback.progress_ms) %> of <%= millis_to_minutes(@playback.current_track.duration_ms) %></p>
+
+    <%= if @playlist.profile_id == @profile.id do %>
+      <button phx-click="play">Play</button>
+      <button phx-click="pause">Pause</button>
+    <% end %>
+  <% else %>
+    <p>No tracks</p>
   <% end %>
+
 </section>
 
 <section>
@@ -43,10 +55,10 @@
   </ul>
 <% end %>
 
-<h3>Tracks</h3>
+<h3>Upcoming Tracks</h3>
 
 <ul>
-<%= for track <- @tracks do %>
+<%= for track <- @playback.upcoming_tracks do %>
   <li><%= track.name %></li>
   <ul>
   <%= for artist <- track.artists do %>

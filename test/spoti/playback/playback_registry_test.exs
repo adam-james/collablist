@@ -5,10 +5,10 @@ defmodule Spoti.Playback.PlaybackRegistryTest do
   alias Spoti.Playback.PlaybackServer
 
   @playlist_id 123
-  
+
   describe "start_link/1" do
     test "returns pid" do
-      {:ok, pid} = PlaybackRegistry.start_link
+      {:ok, pid} = PlaybackRegistry.start_link()
       assert is_pid(pid)
     end
   end

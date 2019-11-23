@@ -1,6 +1,9 @@
 defmodule Spoti.Playback.PlaybackServerTest do
   use ExUnit.Case, async: true
 
+  # NOTE to exclude tests that sleep and thus take more time,
+  # run `mix test --exclude sleeps`.
+
   alias Spoti.Playback.PlaybackServer
 
   describe "start_link/1" do
@@ -40,6 +43,7 @@ defmodule Spoti.Playback.PlaybackServerTest do
       assert is_reference(PlaybackServer.get_state(pid).timer_ref)
     end
 
+    @tag :sleeps
     test "starts progress", %{pid: pid} do
       # TODO can you mock time instead of sleeping?
       PlaybackServer.play(pid)
@@ -76,6 +80,7 @@ defmodule Spoti.Playback.PlaybackServerTest do
       assert PlaybackServer.get_state(pid).timer_ref == nil
     end
 
+    @tag :sleeps
     test "stops progress", %{pid: pid} do
       PlaybackServer.play(pid)
       :timer.sleep(1000)
