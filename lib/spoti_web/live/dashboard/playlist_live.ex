@@ -49,12 +49,6 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
   def handle_event("pause", _params, socket) do
     pid = get_playback_pid(socket.assigns.playlist)
     playback = PlaybackServer.pause(pid)
-
-    # TODO handle error message if this doesn't match :ok
-    :ok =
-      get_creds!(socket.assigns.profile)
-      |> Spotify.Player.pause()
-
     {:noreply, socket}
   end
 
@@ -79,29 +73,22 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
     playlist = socket.assigns.playlist
     profile = socket.assigns.profile
 
-    {:ok, _track} =
+    {:ok, _} =
       Playlists.create_track(%{
         spotify_id: spotify_id,
         playlist_id: playlist.id,
         added_by_id: socket.assigns.profile.id
       })
 
-    # TODO just load the last track
-    # TODO add track to gen server
+    {:ok, track} = Spotify.Track.get_track(
+      Spoti.Auth.get_credentials!(profile),
+      spotify_id
+    )
 
-    # TODO just send the new track
-    # SpotiWeb.Endpoint.broadcast_from(self(), topic(playlist), "new_track", %{tracks: tracks})
+    get_playback_pid(playlist)
+    |> PlaybackServer.add_track(track)
 
-    socket =
-      socket
-      |> update(:search_results, fn _ -> [] end)
-
-    {:noreply, socket}
-  end
-
-  # Handle messages from other live views.
-  def handle_info(%{event: "new_track", payload: %{tracks: tracks}}, socket) do
-    {:noreply, update(socket, :tracks, fn _ -> tracks end)}
+    {:noreply, assign(socket, :search_results, [])}
   end
 
   # Handle playback state updates.

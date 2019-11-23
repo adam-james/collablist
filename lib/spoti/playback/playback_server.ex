@@ -32,6 +32,10 @@ defmodule Spoti.Playback.PlaybackServer do
     GenServer.call(pid, :pause)
   end
 
+  def add_track(pid, track) do
+    GenServer.call(pid, {:add_track, track})
+  end
+
   # Server
 
   def init(playlist_id) do
@@ -50,13 +54,33 @@ defmodule Spoti.Playback.PlaybackServer do
     {:reply, state, state}
   end
 
+  def handle_call({:add_track, track}, _from, state) do
+    next_state =
+      if state.current_track == nil do
+        %{state | current_track: track}
+      else
+        %{state | upcoming_tracks: state.upcoming_tracks ++ [track] }
+      end
+
+    broadcast(next_state)
+    {:reply, next_state, next_state}
+  end
+
   def handle_call(:play, _from, state) do
     next_state = handle_play(state)
     {:reply, next_state, next_state}
   end
 
   def handle_call(:pause, _from, state) do
-    Process.cancel_timer(state.timer_ref)
+    if state.timer_ref != nil do
+      Process.cancel_timer(state.timer_ref) 
+    end
+
+    # TODO handle error message if this doesn't match :ok
+    :ok =
+      get_playlist_creds(state.playlist_id)
+      |> Spotify.Player.pause()
+
     next_state = %{state | is_playing: false, timer_ref: nil}
     broadcast(next_state)
     {:reply, next_state, next_state}
@@ -101,7 +125,6 @@ defmodule Spoti.Playback.PlaybackServer do
     {:noreply, next_state}
   end
 
-  # TODO broadcast play, pause, and tick
   defp broadcast(state) do
     SpotiWeb.Endpoint.broadcast!(topic(state), "updated_playback", state)
   end
