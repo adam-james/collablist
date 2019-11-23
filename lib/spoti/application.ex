@@ -14,7 +14,8 @@ defmodule Spoti.Application do
       SpotiWeb.Endpoint,
       # Starts a worker by calling: Spoti.Worker.start_link(arg)
       # {Spoti.Worker, arg},
-      SpotiWeb.Presence
+      SpotiWeb.Presence,
+      Spoti.Playback.PlaybackRegistry
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

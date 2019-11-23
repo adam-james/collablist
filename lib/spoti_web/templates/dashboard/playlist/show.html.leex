@@ -3,9 +3,9 @@
 <section>
   <h3>Playback</h3>
 
-  <%= if @playlist.profile_id == @profile.id do %>
-    <p>TODO ADD PLAYBACK STATE HERE. You are going to have to build your own.</p>
+  <p>Progress: <%= millis_to_minutes(@playback.progress_ms) %></p>
 
+  <%= if @playlist.profile_id == @profile.id do %>
     <button phx-click="play">Play</button>
     <button phx-click="pause">Pause</button>
   <% end %>

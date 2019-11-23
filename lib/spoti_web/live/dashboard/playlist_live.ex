@@ -3,12 +3,16 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
 
   alias SpotiWeb.Presence
   alias Spoti.Playlists
+  alias Spoti.Playback.PlaybackRegistry
+  alias Spoti.Playback.PlaybackServer
 
   def render(assigns) do
     Phoenix.View.render(SpotiWeb.Dashboard.PlaylistView, "show.html", assigns)
   end
 
   def mount(%{profile: profile, playlist: playlist}, socket) do
+    playback = get_playback(playlist)
+
     # Track user presence.
     Presence.track(
       self(),
@@ -33,13 +37,18 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
       |> assign(:playlist, playlist)
       |> assign(:tracks, tracks)
       |> assign(:users, users)
+      |> assign(:playback, playback)
 
     {:ok, socket}
   end
 
   def handle_event("play", _params, socket) do
+    pid = get_playback_pid(socket.assigns.playlist)
+    playback = PlaybackServer.play(pid)
+
+    uri = Enum.map(socket.assigns.tracks, &Map.get(&1, :uri)) |> List.first()
     body =
-      %{"uris" => Enum.map(socket.assigns.tracks, &Map.get(&1, :uri))}
+      %{"uris" => [uri], "position_ms" => playback.progress_ms}
       |> Jason.encode!()
 
     # TODO handle error message if this doesn't match :ok
@@ -51,6 +60,9 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
   end
 
   def handle_event("pause", _params, socket) do
+    pid = get_playback_pid(socket.assigns.playlist)
+    playback = PlaybackServer.pause(pid)
+
     # TODO handle error message if this doesn't match :ok
     :ok =
       get_creds!(socket.assigns.profile)
@@ -106,6 +118,11 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
     {:noreply, update(socket, :tracks, fn _ -> tracks end)}
   end
 
+  # Handle playback state updates.
+  def handle_info(%{event: "updated_playback", payload: playback}, socket) do
+    {:noreply, assign(socket, playback: playback)}
+  end
+
   # Handle presence diffs.
   def handle_info(%{event: "presence_diff"}, socket = %{assigns: %{playlist: playlist}}) do
     users = get_present_users(playlist)
@@ -133,5 +150,18 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
 
   defp get_creds!(profile) do
     Spoti.Auth.get_credentials!(profile)
+  end
+
+  defp get_playback(playlist) do
+    get_playback_pid(playlist) |> PlaybackServer.get_state()
+  end
+
+  defp get_playback_pid(playlist) do
+    case PlaybackRegistry.get_playback(playlist.id) do
+      nil ->
+        {:ok, pid} = PlaybackRegistry.start_playback(playlist.id)
+        pid
+      pid -> pid
+    end
   end
 end
