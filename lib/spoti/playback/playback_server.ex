@@ -59,7 +59,7 @@ defmodule Spoti.Playback.PlaybackServer do
       if state.current_track == nil do
         %{state | current_track: track}
       else
-        %{state | upcoming_tracks: state.upcoming_tracks ++ [track] }
+        %{state | upcoming_tracks: state.upcoming_tracks ++ [track]}
       end
 
     broadcast(next_state)
@@ -73,7 +73,7 @@ defmodule Spoti.Playback.PlaybackServer do
 
   def handle_call(:pause, _from, state) do
     if state.timer_ref != nil do
-      Process.cancel_timer(state.timer_ref) 
+      Process.cancel_timer(state.timer_ref)
     end
 
     # TODO handle error message if this doesn't match :ok

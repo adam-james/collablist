@@ -80,10 +80,11 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
         added_by_id: socket.assigns.profile.id
       })
 
-    {:ok, track} = Spotify.Track.get_track(
-      Spoti.Auth.get_credentials!(profile),
-      spotify_id
-    )
+    {:ok, track} =
+      Spotify.Track.get_track(
+        Spoti.Auth.get_credentials!(profile),
+        spotify_id
+      )
 
     get_playback_pid(playlist)
     |> PlaybackServer.add_track(track)
