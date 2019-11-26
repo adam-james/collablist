@@ -72,18 +72,24 @@ defmodule Spoti.Playback.PlaybackServer do
   end
 
   def handle_call(:pause, _from, state) do
+    state.playlist_id
+    |> get_playlist_creds()
+    |> Spotify.Player.pause()
+    |> build_resp_pause(state)
+  end
+
+  defp build_resp_pause({:error, reason}, state) do
+    {:reply, {:error, reason}, state}
+  end
+
+  defp build_resp_pause(:ok, state) do
     if state.timer_ref != nil do
       Process.cancel_timer(state.timer_ref)
     end
 
-    # TODO handle error message if this doesn't match :ok
-    :ok =
-      get_playlist_creds(state.playlist_id)
-      |> Spotify.Player.pause()
-
     next_state = %{state | is_playing: false, timer_ref: nil}
     broadcast(next_state)
-    {:reply, next_state, next_state}
+    {:reply, {:ok, next_state}, next_state}
   end
 
   def handle_info(:tick, state) do

@@ -3,15 +3,14 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
 
   alias SpotiWeb.Presence
   alias Spoti.Playlists
-  alias Spoti.Playback.PlaybackRegistry
-  alias Spoti.Playback.PlaybackServer
+  alias Spoti.Playback
 
   def render(assigns) do
     Phoenix.View.render(SpotiWeb.Dashboard.PlaylistView, "show.html", assigns)
   end
 
   def mount(%{profile: profile, playlist: playlist}, socket) do
-    playback = get_playback(playlist)
+    {:ok, playback} = Playback.ensure_playback_started(playlist.id)
 
     # Track user presence.
     Presence.track(
@@ -41,14 +40,12 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
   end
 
   def handle_event("play", _params, socket) do
-    pid = get_playback_pid(socket.assigns.playlist)
-    playback = PlaybackServer.play(pid)
+    {:ok, _} = Playback.play(socket.assigns.playlist.id)
     {:noreply, socket}
   end
 
   def handle_event("pause", _params, socket) do
-    pid = get_playback_pid(socket.assigns.playlist)
-    playback = PlaybackServer.pause(pid)
+    {:ok, _} = Playback.pause(socket.assigns.playlist.id)
     {:noreply, socket}
   end
 
@@ -86,8 +83,7 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
         spotify_id
       )
 
-    get_playback_pid(playlist)
-    |> PlaybackServer.add_track(track)
+    {:ok, _} = Playback.add_track(playlist.id, track)
 
     {:noreply, assign(socket, :search_results, [])}
   end
@@ -117,21 +113,5 @@ defmodule SpotiWeb.Dashboard.PlaylistLive do
 
   defp get_creds!(profile) do
     Spoti.Auth.get_credentials!(profile)
-  end
-
-  # TODO this stuff should go through the registry
-  defp get_playback(playlist) do
-    get_playback_pid(playlist) |> PlaybackServer.get_state()
-  end
-
-  defp get_playback_pid(playlist) do
-    case PlaybackRegistry.get_playback(playlist.id) do
-      nil ->
-        {:ok, pid} = PlaybackRegistry.start_playback(playlist.id)
-        pid
-
-      pid ->
-        pid
-    end
   end
 end
