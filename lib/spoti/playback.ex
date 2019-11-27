@@ -18,7 +18,6 @@ defmodule Spoti.Playback do
 
   # Private
 
-  # TODO handle play, pause, and add_track failures
   defp do_play({:error, reason}), do: {:error, reason}
   defp do_play({:ok, pid}), do: {:ok, PlaybackServer.play(pid)}
 
@@ -36,19 +35,18 @@ defmodule Spoti.Playback do
   end
 
   defp get_playback(playlist_id) do
-    case get_playback_pid(playlist_id) do
-      {:ok, pid} -> {:ok, PlaybackServer.get_state(pid)}
-    end
+    playlist_id
+    |> get_playback_pid()
+    |> get_or_start_playback()
   end
 
   defp get_playback_pid(playlist_id) do
     case PlaybackRegistry.get_playback(playlist_id) do
-      nil ->
-        {:ok, pid} = PlaybackRegistry.start_playback(playlist_id)
-        {:ok, pid}
-
-      pid ->
-        {:ok, pid}
+      nil -> PlaybackRegistry.start_playback(playlist_id)
+      pid -> {:ok, pid}
     end
   end
+
+  defp get_or_start_playback({:error, reason}), do: {:error, reason}
+  defp get_or_start_playback({:ok, pid}), do: {:ok, PlaybackServer.get_state(pid)}
 end
