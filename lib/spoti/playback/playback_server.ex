@@ -4,7 +4,6 @@ defmodule Spoti.Playback.PlaybackServer do
   alias Spoti.Playback.PlaybackServer
   alias Spoti.Playlists
   alias Spoti.Profiles
-  alias Spoti.Auth
 
   defstruct playlist_id: -1,
             current_track: nil,
@@ -67,8 +66,12 @@ defmodule Spoti.Playback.PlaybackServer do
   end
 
   def handle_call(:play, _from, state) do
-    next_state = handle_play(state)
-    {:reply, next_state, next_state}
+    case handle_play(state) do
+      {:error, reason} ->
+        {:reply, {:error, reason}, state}
+      {:ok, next_state} ->
+        {:reply, {:ok, next_state}, next_state}
+    end
   end
 
   def handle_call(:pause, _from, state) do
@@ -127,7 +130,7 @@ defmodule Spoti.Playback.PlaybackServer do
   end
 
   def handle_info(:play_next, state) do
-    next_state = handle_play(state)
+    {:ok, next_state} = handle_play(state)
     {:noreply, next_state}
   end
 
@@ -186,25 +189,34 @@ defmodule Spoti.Playback.PlaybackServer do
 
   defp handle_play(state) do
     cond do
-      state.is_playing -> state
-      state.current_track == nil -> state
+      state.is_playing -> {:error, "Already playing."}
+      state.current_track == nil -> {:error, "No track to play."}
       true -> do_play(state)
     end
   end
 
   defp do_play(state) do
-    body =
-      %{"uris" => [state.current_track.uri], "position_ms" => state.progress_ms}
-      |> Jason.encode!()
+    state
+    |> build_play_req()
+    |> request_play(state.playlist_id)
+    |> handle_play_resp(state)
+  end
 
-    # TODO handle error message if this doesn't match :ok
-    :ok =
-      get_playlist_creds(state.playlist_id)
-      |> Spotify.Player.play(body)
+  defp build_play_req(state) do
+    %{"uris" => [state.current_track.uri], "position_ms" => state.progress_ms}
+    |> Jason.encode!()
+  end
 
+  defp request_play(body, playlist_id) do
+    get_playlist_creds(playlist_id)
+    |> Spotify.Player.play(body)
+  end
+
+  defp handle_play_resp({:error, reason}, _state), do: {:error, reason}
+  defp handle_play_resp(:ok, state) do
     timer_ref = Process.send_after(self(), :tick, 1000)
     next_state = %{state | is_playing: true, timer_ref: timer_ref}
     broadcast(next_state)
-    next_state
+    {:ok, next_state}
   end
 end

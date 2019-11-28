@@ -42,25 +42,42 @@ defmodule Spoti.Playback.PlaybackServerTest do
   end
 
   describe "play/1" do
-    test "it does not play when no current track", %{pid: pid} do
-      :sys.replace_state(pid, fn state -> %{state | current_track: nil} end)
-      next_state = PlaybackServer.play(pid)
-      assert next_state.current_track == nil
-      assert next_state.is_playing == false
-    end
-
     test "it plays when current track", %{pid: pid} do
-      next_state = PlaybackServer.play(pid)
+      {:ok, next_state} = PlaybackServer.play(pid)
       assert next_state.current_track == %Spotify.Track{}
       assert next_state.is_playing == true
       assert is_reference(next_state.timer_ref)
       assert_called(Spotify.Player.play(:_, :_))
     end
+
+    test "it does not play when no current track", %{pid: pid} do
+      :sys.replace_state(pid, fn state -> %{state | current_track: nil} end)
+      {:error, "No track to play."} = PlaybackServer.play(pid)
+      next_state = PlaybackServer.get_state(pid)
+      assert next_state.current_track == nil
+      assert next_state.is_playing == false
+    end
+
+    test "it does not play when currently playing", %{pid: pid} do
+      :sys.replace_state(pid, fn state -> %{state | is_playing: true} end)
+      {:error, "Already playing."} = PlaybackServer.play(pid)
+    end
+
+    test "returns Spotify error", %{pid: pid} do
+      with_mock Spotify.Player,
+      play: fn _, _ -> {:error, "Could not play."} end,
+      pause: fn _ -> :ok end do
+      {:error, "Could not play."} = PlaybackServer.play(pid)
+      next_state = PlaybackServer.get_state(pid)
+      assert next_state.is_playing == false
+      assert next_state.timer_ref == nil
+    end
+    end
   end
 
   describe "pause/1" do
     test "pauses playback", %{pid: pid} do
-      next_state = PlaybackServer.play(pid)
+      {:ok, next_state} = PlaybackServer.play(pid)
       assert next_state.is_playing == true
       {:ok, next_state2} = PlaybackServer.pause(pid)
       assert next_state2.is_playing == false
@@ -71,7 +88,7 @@ defmodule Spoti.Playback.PlaybackServerTest do
       with_mock Spotify.Player,
         play: fn _, _ -> :ok end,
         pause: fn _ -> {:error, "Could not pause."} end do
-        next_state = PlaybackServer.play(pid)
+        {:ok, next_state} = PlaybackServer.play(pid)
         {:error, "Could not pause."} = PlaybackServer.pause(pid)
         next_state2 = PlaybackServer.get_state(pid)
         assert next_state2.is_playing == true

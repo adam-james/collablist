@@ -19,7 +19,7 @@ defmodule Spoti.Playback do
   # Private
 
   defp do_play({:error, reason}), do: {:error, reason}
-  defp do_play({:ok, pid}), do: {:ok, PlaybackServer.play(pid)}
+  defp do_play({:ok, pid}), do: PlaybackServer.play(pid)
 
   defp do_pause({:error, reason}), do: {:error, reason}
   defp do_pause({:ok, pid}), do: PlaybackServer.pause(pid)

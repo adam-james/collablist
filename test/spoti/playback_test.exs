@@ -65,10 +65,26 @@ defmodule Spoti.PlaybackTest do
          ]},
         {PlaybackServer, [],
          [
-           play: fn "fake-pid" -> %PlaybackServer{playlist_id: 123, is_playing: true} end
+           play: fn "fake-pid" -> {:ok, %PlaybackServer{playlist_id: 123, is_playing: true}} end
          ]}
       ] do
         assert {:ok, %PlaybackServer{playlist_id: 123, is_playing: true}} = Playback.play(123)
+        assert_called(PlaybackServer.play("fake-pid"))
+      end
+    end
+
+    test "returns PlaybackServer error" do
+      with_mocks [
+        {PlaybackRegistry, [],
+         [
+           get_playback: fn 123 -> "fake-pid" end
+         ]},
+        {PlaybackServer, [],
+         [
+           play: fn "fake-pid" -> {:error, "Could not play"} end
+         ]}
+      ] do
+        assert {:error, "Could not play"} = Playback.play(123)
         assert_called(PlaybackServer.play("fake-pid"))
       end
     end
@@ -94,10 +110,26 @@ defmodule Spoti.PlaybackTest do
          ]},
         {PlaybackServer, [],
          [
-           pause: fn "fake-pid" -> %PlaybackServer{playlist_id: 123, is_playing: false} end
+           pause: fn "fake-pid" -> {:ok, %PlaybackServer{playlist_id: 123, is_playing: false}} end
          ]}
       ] do
         assert {:ok, %PlaybackServer{playlist_id: 123, is_playing: false}} = Playback.pause(123)
+        assert_called(PlaybackServer.pause("fake-pid"))
+      end
+    end
+
+    test "returns PlaybackServer error" do
+      with_mocks [
+        {PlaybackRegistry, [],
+         [
+           get_playback: fn 123 -> "fake-pid" end
+         ]},
+        {PlaybackServer, [],
+         [
+           pause: fn "fake-pid" -> {:error, "Could not pause"} end
+         ]}
+      ] do
+        assert {:error, "Could not pause"} = Playback.pause(123)
         assert_called(PlaybackServer.pause("fake-pid"))
       end
     end
