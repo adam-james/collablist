@@ -22,7 +22,7 @@ defmodule Spoti.Playback do
   defp do_play({:ok, pid}), do: {:ok, PlaybackServer.play(pid)}
 
   defp do_pause({:error, reason}), do: {:error, reason}
-  defp do_pause({:ok, pid}), do: {:ok, PlaybackServer.pause(pid)}
+  defp do_pause({:ok, pid}), do: PlaybackServer.pause(pid)
 
   defp do_add_track({:error, reason}, _track), do: {:error, reason}
   defp do_add_track({:ok, pid}, track), do: {:ok, PlaybackServer.add_track(pid, track)}
