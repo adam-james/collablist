@@ -2,7 +2,9 @@ defmodule Spoti.Playback do
   alias Spoti.Playback.PlaybackRegistry
   alias Spoti.Playback.PlaybackServer
 
-  def ensure_playback_started(playlist_id), do: get_playback(playlist_id)
+  def ensure_playback_started(playlist_id) do
+    playlist_id |> get_playback_pid() |> get_or_start_playback()
+  end
 
   def play(playlist_id) do
     playlist_id |> find_playback() |> do_play()
@@ -32,12 +34,6 @@ defmodule Spoti.Playback do
       nil -> {:error, "Playback not found."}
       pid -> {:ok, pid}
     end
-  end
-
-  defp get_playback(playlist_id) do
-    playlist_id
-    |> get_playback_pid()
-    |> get_or_start_playback()
   end
 
   defp get_playback_pid(playlist_id) do
